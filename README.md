@@ -114,7 +114,8 @@ sudo pip3 install thefuck
 
 On FreeBSD, install *The Fuck* with the following commands:
 ```bash
-pkg install thefuck
+sudo portsnap fetch update
+cd /usr/ports/misc/thefuck && sudo make install clean
 ```
 
 On ChromeOS, install *The Fuck* using [chromebrew](https://github.com/skycocker/chromebrew) with the following command:
@@ -189,9 +190,7 @@ following rules are enabled by default:
 * `dirty_unzip` &ndash; fixes `unzip` command that unzipped in the current directory;
 * `django_south_ghost` &ndash; adds `--delete-ghost-migrations` to failed because ghosts django south migration;
 * `django_south_merge` &ndash; adds `--merge` to inconsistent django south migration;
-* `docker_login` &ndash; executes a `docker login` and repeats the previous command;
 * `docker_not_command` &ndash; fixes wrong docker commands like `docker tags`;
-* `docker_image_being_used_by_container` &dash; removes the container that is using the image before removing the image;
 * `dry` &ndash; fixes repetitions like `git git push`;
 * `fab_command_not_found` &ndash; fix misspelled fabric commands;
 * `fix_alt_space` &ndash; replaces Alt+Space with Space character;
@@ -205,12 +204,12 @@ following rules are enabled by default:
 * `git_branch_list` &ndash; catches `git branch list` in place of `git branch` and removes created branch;
 * `git_checkout` &ndash; fixes branch name or creates new branch;
 * `git_commit_amend` &ndash; offers `git commit --amend` after previous commit;
-* `git_commit_reset` &ndash; offers `git reset HEAD~` after previous commit;
 * `git_diff_no_index` &ndash; adds `--no-index` to previous `git diff` on untracked files;
 * `git_diff_staged` &ndash; adds `--staged` to previous `git diff` with unexpected output;
 * `git_fix_stash` &ndash; fixes `git stash` commands (misspelled subcommand and missing `save`);
 * `git_flag_after_filename` &ndash; fixes `fatal: bad flag '...' after filename`
 * `git_help_aliased` &ndash; fixes `git help <alias>` commands replacing <alias> with the aliased command;
+* `git_log` &ndash; replaces `git lock` command with `git log`;
 * `git_merge` &ndash; adds remote to branch names;
 * `git_merge_unrelated` &ndash; adds `--allow-unrelated-histories` when required
 * `git_not_command` &ndash; fixes wrong git commands like `git brnch`;
@@ -233,7 +232,6 @@ following rules are enabled by default:
 * `git_tag_force` &ndash; adds `--force` to `git tag <tagname>` when the tag already exists;
 * `git_two_dashes` &ndash; adds a missing dash to commands like `git commit -amend` or `git rebase -continue`;
 * `go_run` &ndash; appends `.go` extension when compiling/running Go programs;
-* `go_unknown_command` &ndash; fixes wrong `go` commands, for example `go bulid`;
 * `gradle_no_task` &ndash; fixes not found or ambiguous `gradle` task;
 * `gradle_wrapper` &ndash; replaces `gradle` with `./gradlew`;
 * `grep_arguments_order` &ndash; fixes `grep` arguments order for situations like `grep -lir . test`;
@@ -267,12 +265,10 @@ following rules are enabled by default:
 * `no_command` &ndash; fixes wrong console commands, for example `vom/vim`;
 * `no_such_file` &ndash; creates missing directories with `mv` and `cp` commands;
 * `open` &ndash; either prepends `http://` to address passed to `open` or create a new file or directory and passes it to `open`;
-* `pip_install` &ndash; fixes permission issues with `pip install` commands by adding `--user` or prepending `sudo` if necessary;
 * `pip_unknown_command` &ndash; fixes wrong `pip` commands, for example `pip instatl/pip install`;
 * `php_s` &ndash; replaces `-s` by `-S` when trying to run a local php server;
 * `port_already_in_use` &ndash; kills process that bound port;
 * `prove_recursively` &ndash; adds `-r` when called with directory;
-* `pyenv_no_such_command` &ndash; fixes wrong pyenv commands like `pyenv isntall` or `pyenv list`;
 * `python_command` &ndash; prepends `python` when you try to run non-executable/without `./` python script;
 * `python_execute` &ndash; appends missing `.py` when executing Python files;
 * `quotation_marks` &ndash; fixes uneven usage of `'` and `"` when containing args';
@@ -288,7 +284,6 @@ following rules are enabled by default:
 * `sudo_command_from_user_path` &ndash; runs commands from users `$PATH` with `sudo`;
 * `switch_lang` &ndash; switches command from your local layout to en;
 * `systemctl` &ndash; correctly orders parameters of confusing `systemctl`;
-* `terraform_init.py` &ndash; run `terraform init` before plan or apply;
 * `test.py` &ndash; runs `py.test` instead of `test.py`;
 * `touch` &ndash; creates missing directories before "touching";
 * `tsuru_login` &ndash; runs `tsuru login` if not authenticated or session expired;
@@ -319,9 +314,8 @@ The following rules are enabled by default on specific platforms only:
 * `brew_unknown_command` &ndash; fixes wrong brew commands, for example `brew docto/brew doctor`;
 * `brew_update_formula` &ndash; turns `brew update <formula>` into `brew upgrade <formula>`;
 * `dnf_no_such_command` &ndash; fixes mistyped DNF commands;
-* `nixos_cmd_not_found` &ndash; installs apps on NixOS;
-* `pacman` &ndash; installs app with `pacman` if it is not installed (uses `yay` or `yaourt` if available);
-* `pacman_not_found` &ndash; fixes package name with `pacman`, `yay` or `yaourt`.
+* `pacman` &ndash; installs app with `pacman` if it is not installed (uses `yaourt` if available);
+* `pacman_not_found` &ndash; fixes package name with `pacman` or `yaourt`.
 
 The following commands are bundled with *The Fuck*, but are not enabled by
 default:
