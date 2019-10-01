@@ -47,6 +47,10 @@ class Parser(object):
             action='store',
             help=SUPPRESS)
         self._parser.add_argument(
+            'off',
+            action='store_true',
+            help='')
+        self._parser.add_argument(
             'command',
             nargs='*',
             help='command that should be fixed')
@@ -55,7 +59,7 @@ class Parser(object):
         """It's too dangerous to use `-y` and `-r` together."""
         group = self._parser.add_mutually_exclusive_group()
         group.add_argument(
-            '-y', '--yes', '--yeah',
+            '-y', '--yes',
             action='store_true',
             help='execute fixed command without confirmation')
         group.add_argument(
