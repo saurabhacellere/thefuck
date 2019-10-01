@@ -1,29 +1,27 @@
 import os
-from subprocess import Popen, PIPE
 from tempfile import gettempdir
 from uuid import uuid4
 from ..conf import settings
 from ..const import ARGUMENT_PLACEHOLDER, USER_COMMAND_MARK
-from ..utils import DEVNULL, memoize
+from ..utils import memoize
 from .generic import Generic
 
 
 class Bash(Generic):
-    friendly_name = 'Bash'
-
     def app_alias(self, alias_name):
         # It is VERY important to have the variables declared WITHIN the function
         return '''
             function {name} () {{
                 TF_PYTHONIOENCODING=$PYTHONIOENCODING;
                 export TF_SHELL=bash;
+                export TF_STATUS=$?;
                 export TF_ALIAS={name};
                 export TF_SHELL_ALIASES=$(alias);
                 export TF_HISTORY=$(fc -ln -10);
                 export PYTHONIOENCODING=utf-8;
                 TF_CMD=$(
-                    thefuck {argument_placeholder} "$@"
-                ) && eval "$TF_CMD";
+                    thefuck {argument_placeholder} $@
+                ) && eval $TF_CMD;
                 unset TF_HISTORY;
                 export PYTHONIOENCODING=$TF_PYTHONIOENCODING;
                 {alter_history}
@@ -81,12 +79,6 @@ class Bash(Generic):
             config = 'bash config'
 
         return self._create_shell_configuration(
-            content=u'eval "$(thefuck --alias)"',
+            content=u'eval $(thefuck --alias)',
             path=config,
             reload=u'source {}'.format(config))
-
-    def _get_version(self):
-        """Returns the version of the current shell"""
-        proc = Popen(['bash', '-c', 'echo $BASH_VERSION'],
-                     stdout=PIPE, stderr=DEVNULL)
-        return proc.stdout.read().decode('utf-8').strip()

@@ -5,7 +5,6 @@ import sys
 import six
 from .. import logs
 from ..conf import settings
-from ..const import ARGUMENT_PLACEHOLDER
 from ..utils import DEVNULL, cache
 from .generic import Generic
 
@@ -21,32 +20,22 @@ def _get_functions(overridden):
 def _get_aliases(overridden):
     aliases = {}
     proc = Popen(['fish', '-ic', 'alias'], stdout=PIPE, stderr=DEVNULL)
-    alias_out = proc.stdout.read().decode('utf-8').strip()
-    if not alias_out:
-        return aliases
-    for alias in alias_out.split('\n'):
-        for separator in (' ', '='):
-            split_alias = alias.replace('alias ', '', 1).split(separator, 1)
-            if len(split_alias) == 2:
-                name, value = split_alias
-                break
-        else:
-            continue
+    alias_out = proc.stdout.read().decode('utf-8').strip().split('\n')
+    for alias in alias_out:
+        name, value = alias.replace('alias ', '', 1).split(' ', 1)
         if name not in overridden:
             aliases[name] = value
     return aliases
 
 
 class Fish(Generic):
-    friendly_name = 'Fish Shell'
-
     def _get_overridden_aliases(self):
         overridden = os.environ.get('THEFUCK_OVERRIDDEN_ALIASES',
                                     os.environ.get('TF_OVERRIDDEN_ALIASES', ''))
         default = {'cd', 'grep', 'ls', 'man', 'open'}
         for alias in overridden.split(','):
             default.add(alias.strip())
-        return sorted(default)
+        return default
 
     def app_alias(self, alias_name):
         if settings.alter_history:
@@ -58,12 +47,12 @@ class Fish(Generic):
         # It is VERY important to have the variables declared WITHIN the alias
         return ('function {0} -d "Correct your previous console command"\n'
                 '  set -l fucked_up_command $history[1]\n'
-                '  env TF_SHELL=fish TF_ALIAS={0} PYTHONIOENCODING=utf-8'
-                ' thefuck $fucked_up_command {2} $argv | read -l unfucked_command\n'
+                '  env TF_SHELL=fish TF_ALIAS={0} TF_STATUS=$status PYTHONIOENCODING=utf-8'
+                ' thefuck $fucked_up_command | read -l unfucked_command\n'
                 '  if [ "$unfucked_command" != "" ]\n'
                 '    eval $unfucked_command\n{1}'
                 '  end\n'
-                'end').format(alias_name, alter_history, ARGUMENT_PLACEHOLDER)
+                'end').format(alias_name, alter_history)
 
     def get_aliases(self):
         overridden = self._get_overridden_aliases()
@@ -105,11 +94,6 @@ class Fish(Generic):
             content=u"thefuck --alias | source",
             path='~/.config/fish/config.fish',
             reload='fish')
-
-    def _get_version(self):
-        """Returns the version of the current shell"""
-        proc = Popen(['fish', '--version'], stdout=PIPE, stderr=DEVNULL)
-        return proc.stdout.read().decode('utf-8').split()[-1]
 
     def put_to_history(self, command):
         try:
