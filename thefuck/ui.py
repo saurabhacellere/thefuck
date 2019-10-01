@@ -52,7 +52,7 @@ class CommandSelector(object):
 
     @property
     def value(self):
-        """:rtype thefuck.types.CorrectedCommand"""
+        """:rtype hefuck.types.CorrectedCommand"""
         return self._commands[self._index]
 
 
@@ -70,8 +70,14 @@ def select_command(corrected_commands):
     try:
         selector = CommandSelector(corrected_commands)
     except NoRuleMatched:
-        logs.failed('No fucks given' if get_alias() == 'fuck'
-                    else 'Nothing found')
+        alias = get_alias()
+        if alias == 'fuck':
+            message = 'No fucks given'
+        elif alias == 'shit':
+            message = 'Don\'t give a shit'
+        else:
+            message = 'Nothing found'
+        logs.failed(message)
         return
 
     if not settings.require_confirmation:
