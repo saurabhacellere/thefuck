@@ -3,12 +3,12 @@ import os
 import pickle
 import re
 import shelve
-import sys
 import six
+import sys
 from decorator import decorator
-from difflib import get_close_matches as difflib_get_close_matches
+from difflib import get_close_matches
 from functools import wraps
-from .logs import warn, exception
+from .logs import warn
 from .conf import settings
 from .system import Path
 
@@ -87,21 +87,14 @@ def default_settings(params):
     return decorator(_default_settings)
 
 
-def get_closest(word, possibilities, cutoff=0.6, fallback_to_first=True):
+def get_closest(word, possibilities, n=3, cutoff=0.6, fallback_to_first=True):
     """Returns closest match or just first from possibilities."""
     possibilities = list(possibilities)
     try:
-        return difflib_get_close_matches(word, possibilities, 1, cutoff)[0]
+        return get_close_matches(word, possibilities, n, cutoff)[0]
     except IndexError:
         if fallback_to_first:
             return possibilities[0]
-
-
-def get_close_matches(word, possibilities, n=None, cutoff=0.6):
-    """Overrides `difflib.get_close_match` to controle argument `n`."""
-    if n is None:
-        n = settings.num_close_matches
-    return difflib_get_close_matches(word, possibilities, n, cutoff)
 
 
 @memoize
@@ -124,6 +117,10 @@ def get_all_executables():
             and exe.name not in tf_entry_points]
     aliases = [alias.decode('utf8') if six.PY2 else alias
                for alias in shell.get_aliases() if alias != tf_alias]
+
+    win32 = sys.platform.startswith('win')
+    if win32:
+        bins += [exe[:-4] for exe in bins if exe.endswith(".exe")]
 
     return bins + aliases
 
@@ -198,13 +195,6 @@ class Cache(object):
         self._db = None
 
     def _init_db(self):
-        try:
-            self._setup_db()
-        except Exception:
-            exception("Unable to init cache", sys.exc_info())
-            self._db = {}
-
-    def _setup_db(self):
         cache_dir = self._get_cache_dir()
         cache_path = Path(cache_dir).joinpath('thefuck').as_posix()
 
