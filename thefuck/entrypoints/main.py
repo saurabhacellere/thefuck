@@ -32,6 +32,7 @@ def main():
             from .shell_logger import shell_logger  # noqa: E402
         except ImportError:
             logs.warn('Shell logger supports only Linux and macOS')
+            logs.warn('Shell logger supports only Linux and macOS')
         else:
             shell_logger(known_args.shell_logger)
     else:
